@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "nokogiri_truncate_html"
-  gem.version       = '0.0.3'
+  gem.version       = '0.0.4'
   gem.authors       = ["Ian White", "Derek Kraan"]
   gem.email         = ["derek@springest.com"]
   gem.description   = %q{truncate_html helper that is html and html entities friendly}
@@ -16,9 +16,9 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency "nokogiri", "~> 1.5.8"
-  gem.add_dependency "activesupport", "~> 3.2.13"
-  gem.add_dependency "htmlentities", "~> 4.3.1"
+  gem.add_dependency "nokogiri", ">= 1.5.8"
+  gem.add_dependency "activesupport", ">= 3.2.13"
+  gem.add_dependency "htmlentities", ">= 4.3.1"
 
   gem.add_development_dependency "rspec", ">2"
 end
