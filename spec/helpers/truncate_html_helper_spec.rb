@@ -7,22 +7,22 @@ describe NokogiriTruncateHtml::TruncateHtmlHelper do
 
   describe "examples from Rails doc" do
     it "'Once upon a time in a world far far away'" do
-      truncate_html("Once upon a time in a world far far away").should == "Once upon a time in a world fa&hellip;"
+      expect(truncate_html("Once upon a time in a world far far away")).to eq("Once upon a time in a world fa&hellip;")
     end
 
     it "'Once upon a time in a world far far away', :length => 14" do
-      truncate_html("Once upon a time in a world far far away", :length => 14).should == "Once upon a ti&hellip;"
+      expect(truncate_html("Once upon a time in a world far far away", :length => 14)).to eq("Once upon a ti&hellip;")
     end
 
     it "'And they found that many people were sleeping better.', :length => 25, :omission => '(clipped)'" do
-      truncate_html("And they found that many people were sleeping better.", :length => 25, :omission => "(clipped)").should == "And they found that many (clipped)"
+      expect(truncate_html("And they found that many people were sleeping better.", :length => 25, :omission => "(clipped)")).to eq("And they found that many (clipped)")
     end
   end
 
   describe "use cases" do
     def self.with_length_should_equal(n, str)
       it "#{n}, should equal #{str}" do
-        truncate_html(@html, :length => n).should == str
+        expect(truncate_html(@html, :length => n)).to eq(str)
       end
     end
 
@@ -51,6 +51,6 @@ describe NokogiriTruncateHtml::TruncateHtmlHelper do
   end
 
   it "converts ' to &#39;" do
-    truncate_html("30's").should == "30&#39;s"
+    expect(truncate_html("30's")).to eq("30&#39;s")
   end
 end
