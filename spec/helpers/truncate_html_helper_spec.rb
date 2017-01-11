@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require 'active_support/core_ext/benchmark'
 
@@ -50,13 +50,14 @@ describe NokogiriTruncateHtml::TruncateHtmlHelper do
     end
   end
 
-  it "should not convert ' to &apos; (html4 compat)" do
-    truncate_html("30's").should == "30's"
+  it "converts ' to &#39;" do
+    truncate_html("30's").should == "30&#39;s"
   end
 
   describe 'benchmark' do
     let(:test_string) { File.read('spec/fixtures/index.html') }
     subject { Benchmark.ms { 100.times { |a| truncate_html(test_string, length: a*50) } } / 100 }
+
     it 'is faster than 1.5ms' do
       should be < 1.5
     end
