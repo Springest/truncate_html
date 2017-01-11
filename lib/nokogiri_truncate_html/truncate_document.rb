@@ -1,27 +1,15 @@
+# frozen_string_literal: true
+
 require 'nokogiri'
 require 'cgi'
 
 module NokogiriTruncateHtml
-  class TruncateFinished < Exception
-  end
-
   class TruncateDocument < Nokogiri::XML::SAX::Document
-
     def initialize
-      # We use the xhtml "flavour" so that we can decode
-      # apostrophes. That is the only difference between
-      # xhtml1 and html4.
-      @encoder = HTMLEntities.new('xhtml1')
       @discard_first_element = false
     end
 
-    def length=(length)
-      @length = length
-    end
-
-    def omission=(omission)
-      @omission = omission
-    end
+    attr_writer :length, :omission
 
     def output
       while @tags.size > 0
@@ -31,12 +19,11 @@ module NokogiriTruncateHtml
     end
 
     def start_document
-      @output, @chars_remaining, @tags = '', @length, []
+      @output, @chars_remaining, @tags = String.new, @length, []
       @discard_first_element = false
     end
 
-    def characters(string)
-      text = @encoder.decode(string)
+    def characters(text)
       @output << CGI.escapeHTML(text[0, @chars_remaining])
       @chars_remaining -= text.length
       if @chars_remaining < 0
@@ -45,16 +32,33 @@ module NokogiriTruncateHtml
       end
     end
 
+    HTML_TAG = 'html'.freeze
+    BODY_TAG = 'body'.freeze
+    BR_TAG = 'br'.freeze
+    EMBED_TAG = 'embed'.freeze
+    HR_TAG = 'hr'.freeze
+    IMG_TAG = 'img'.freeze
+    INPUT_TAG = 'input'.freeze
+    PARAM_TAG = 'param'.freeze
+
     def start_element(name, attrs = [])
       unless @discard_first_element
-        return if %w(html body).include? name
+        return if name == HTML_TAG || name == BODY_TAG
         return @discard_first_element = true
       end
 
-      if %w(br embed hr img input param).include? name
-        @output << "<#{name}#{' ' if attrs.size > 0 }#{attrs.map { |attr,val| "#{attr}=\"#{val}\"" }.join(' ')} />"
+      @output << "<#{name}"
+      unless attrs.empty?
+        attrs.each do |attr, val|
+          @output << " #{attr}=\"#{val}\""
+        end
+      end
+
+      if name == BR_TAG || name == EMBED_TAG || name == HR_TAG ||
+          name == IMG_TAG || name == INPUT_TAG || name == PARAM_TAG
+        @output << ' />'
       else
-        @output << "<#{name}#{' ' if attrs.size > 0 }#{attrs.map { |attr,val| "#{attr}=\"#{val}\"" }.join(' ')}>"
+        @output << '>'
         @tags.push name
       end
     end
