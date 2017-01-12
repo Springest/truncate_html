@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require 'active_support/core_ext/benchmark'
 
@@ -7,22 +7,22 @@ describe NokogiriTruncateHtml::TruncateHtmlHelper do
 
   describe "examples from Rails doc" do
     it "'Once upon a time in a world far far away'" do
-      truncate_html("Once upon a time in a world far far away").should == "Once upon a time in a world fa&hellip;"
+      expect(truncate_html("Once upon a time in a world far far away")).to eq("Once upon a time in a world fa&hellip;")
     end
 
     it "'Once upon a time in a world far far away', :length => 14" do
-      truncate_html("Once upon a time in a world far far away", :length => 14).should == "Once upon a ti&hellip;"
+      expect(truncate_html("Once upon a time in a world far far away", :length => 14)).to eq("Once upon a ti&hellip;")
     end
 
     it "'And they found that many people were sleeping better.', :length => 25, :omission => '(clipped)'" do
-      truncate_html("And they found that many people were sleeping better.", :length => 25, :omission => "(clipped)").should == "And they found that many (clipped)"
+      expect(truncate_html("And they found that many people were sleeping better.", :length => 25, :omission => "(clipped)")).to eq("And they found that many (clipped)")
     end
   end
 
   describe "use cases" do
     def self.with_length_should_equal(n, str)
       it "#{n}, should equal #{str}" do
-        truncate_html(@html, :length => n).should == str
+        expect(truncate_html(@html, :length => n)).to eq(str)
       end
     end
 
@@ -50,15 +50,7 @@ describe NokogiriTruncateHtml::TruncateHtmlHelper do
     end
   end
 
-  it "should not convert ' to &apos; (html4 compat)" do
-    truncate_html("30's").should == "30's"
-  end
-
-  describe 'benchmark' do
-    let(:test_string) { File.read('spec/fixtures/index.html') }
-    subject { Benchmark.ms { 100.times { |a| truncate_html(test_string, length: a*50) } } / 100 }
-    it 'is faster than 1.5ms' do
-      should be < 1.5
-    end
+  it "converts ' to &#39;" do
+    expect(truncate_html("30's")).to eq("30&#39;s")
   end
 end

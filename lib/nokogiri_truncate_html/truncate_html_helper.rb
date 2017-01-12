@@ -4,9 +4,6 @@ require 'nokogiri_truncate_html/truncate_document'
 
 module NokogiriTruncateHtml
   module TruncateHtmlHelper
-    mattr_accessor :parser
-    mattr_accessor :document
-
     # Truncates html respecting tags and html entities.
     #
     # The API is the same as ActionView::Helpers::TextHelper#truncate. It uses Nokogiri and HtmlEntities for entity awareness.
@@ -15,8 +12,8 @@ module NokogiriTruncateHtml
     #  truncate_html '<p>Hello <strong>World</strong></p>', :length => 7 # => '<p>Hello <strong>W&hellip;</strong></p>'
     #  truncate_html '<p>Hello &amp; Goodbye</p>', :length => 7          # => '<p>Hello &amp;&hellip;</p>'
     def truncate_html(input, *args)
-      self.document ||= TruncateDocument.new#(TruncateHtmlHelper.flavor) #, length, omission)
-      self.parser ||= Nokogiri::HTML::SAX::Parser.new(document)
+      document = truncate_html_document
+      parser = truncate_html_parser
 
       # support both 2.2 & earlier APIs
       options = args.extract_options!
@@ -25,12 +22,22 @@ module NokogiriTruncateHtml
 
       # Adding div around the input is a hack. It gets removed in TruncateDocument.
       input = "<div>#{input}</div>"
-      self.document.length = length
-      self.document.omission = omission
+      document.length = length
+      document.omission = omission
       catch(:truncate_finished) do
-        self.parser.parse_memory(input)
+        parser.parse_memory(input)
       end
-      self.document.output.html_safe
+      document.output.html_safe
+    end
+
+    private
+
+    def truncate_html_document
+      Thread.current[:truncate_html_document] ||= TruncateDocument.new
+    end
+
+    def truncate_html_parser
+      Thread.current[:truncate_html_parser] ||= Nokogiri::HTML::SAX::Parser.new(truncate_html_document)
     end
   end
 end
