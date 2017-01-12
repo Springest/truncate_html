@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "nokogiri_truncate_html"
-  gem.version       = '0.0.4'
+  gem.version       = '0.0.5'
   gem.authors       = ["Ian White", "Derek Kraan"]
   gem.email         = ["derek@springest.com"]
   gem.description   = %q{truncate_html helper that is html and html entities friendly}
